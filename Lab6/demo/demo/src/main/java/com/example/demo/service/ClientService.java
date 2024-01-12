@@ -46,22 +46,19 @@ public class ClientService {
         return clientRepository.findAll();
     }
 
-    public Optional<Client> getClientById(UUID id) {
-        return clientRepository.findById(id);
+    public Client getClientById(UUID id) {
+        return retreiveClient(id);
+    }
+
+    private Client retreiveClient(UUID clientID){
+        return clientRepository.findById(clientID)
+                .orElseThrow(() -> new ClientNotFoundException(clientID));
     }
 
     public Client updateClient(UUID clientID, ClientDTO clientDTO) {
-        Optional<Client> optionalClient = clientRepository.findById(clientID);
-
-        if (optionalClient.isPresent()) {
-            Client clientToUpdate = optionalClient.get();
-
-            clientToUpdate.updateUsingDTO(clientDTO);
-
-            return clientRepository.save(clientToUpdate);
-        } else {
-            throw new ClientNotFoundException(clientID);
-        }
+        Client clientToUpdate = retreiveClient(clientID);
+        clientToUpdate.updateUsingDTO(clientDTO);
+        return clientRepository.save(clientToUpdate);
     }
 
     public void deleteClient(UUID clientId) {

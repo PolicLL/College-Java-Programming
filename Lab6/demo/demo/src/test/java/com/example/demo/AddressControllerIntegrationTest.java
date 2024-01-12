@@ -58,7 +58,8 @@ public class AddressControllerIntegrationTest {
         assertEquals("Street Name 1", responseEntity.getBody().getStreetName());
 
         Address address = addressController.getAddress(responseEntity.getBody().getId()).getBody();
-        assertEquals("Street Name 1", address.getStreetName());
+	    assert address != null;
+	    assertEquals("Street Name 1", address.getStreetName());
     }
 
 

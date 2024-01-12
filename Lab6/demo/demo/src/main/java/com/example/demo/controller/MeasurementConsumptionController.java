@@ -7,6 +7,7 @@ import com.example.demo.exception.InvalidInputException;
 import com.example.demo.exception.MeasurementConsumptionNotFoundException;
 import com.example.demo.model.measurement.MeasurementConsumption;
 import com.example.demo.service.MeasurementConsumptionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,10 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/measurement-consumption")
+@RequiredArgsConstructor
 public class MeasurementConsumptionController {
 
 	private final MeasurementConsumptionService measurementConsumptionService;
-
-	@Autowired
-	public MeasurementConsumptionController(MeasurementConsumptionService measurementConsumptionService) {
-		this.measurementConsumptionService = measurementConsumptionService;
-	}
 
 	@PostMapping("/{deviceId}")
 	public ResponseEntity<?> createMeasurementConsumption(@PathVariable UUID deviceId, @RequestBody MeasurementConsumptionDTO measurementDTO) {
@@ -37,11 +34,7 @@ public class MeasurementConsumptionController {
 	@GetMapping
 	public ResponseEntity<List<MeasurementConsumption>> getMeasurementConsumptionList() {
 		List<MeasurementConsumption> measurementConsumptions = measurementConsumptionService.getMeasurementConsumptionList();
-		if (measurementConsumptions.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(measurementConsumptions);
-		} else {
-			return ResponseEntity.ok(measurementConsumptions);
-		}
+		return ResponseEntity.ok(measurementConsumptions);
 	}
 
 	@GetMapping("/year")

@@ -29,9 +29,16 @@ public class AddressController {
 
 	@PostMapping
 	public ResponseEntity<?> createAddress(@RequestBody AddressDTO addressDTO) {
-		Address createdAddress = addressService.createAddress(addressDTO);
-		logger.info("Address created successfully with ID: {}", createdAddress.getId());
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
+
+		try {
+			Address createdAddress = addressService.createAddress(addressDTO);
+			logger.info("Address created successfully with ID: {}", createdAddress.getId());
+			return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
+		} catch (InvalidInputException e) {
+			logger.error("Invalid input for creating address: {}", e.getMessage());
+			ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+		}
 	}
 
 	@GetMapping()
@@ -42,37 +49,46 @@ public class AddressController {
 	) {
 
 		logger.info("Fetching address list with page={}, size={}, sort={}", page, size, String.join(",", sort));
+
 		Page<Address> addresses = addressService.getAddressPageWithSorting(page, size, sort);
 
-		logger.info("Returning {} addresses", addresses.getTotalElements());
-		return ResponseEntity.ok(addresses);
+		return addresses.getContent().stream()
+				.findFirst()
+				.map(address -> {
+					logger.info("Returning {} addresses", addresses.getTotalElements());
+					return ResponseEntity.ok(addresses);
+				})
+				.orElseGet(() -> {
+					logger.warn("No addresses found");
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(addresses);
+				});
 	}
+
 
 	@GetMapping("/{addressId}")
 	public ResponseEntity<Address> getAddress(@PathVariable UUID addressId) {
 
 		logger.info("Returning address with ID: {}", addressId);
-		Address address = addressService.getAddressById(addressId);
-		return ResponseEntity.ok().body(address);
+
+		return Optional.ofNullable(addressService.getAddressById(addressId))
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+
 	}
 
 
 	@PutMapping("/{addressId}")
 	public ResponseEntity<?> updateAddress(@PathVariable UUID addressId, @RequestBody AddressDTO addressDTO) {
 
-		Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
-		logger.info("Address updated successfully with ID: {}", addressId);
-		return ResponseEntity.ok(updatedAddress);
-
-//		try {
-//			Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
-//			logger.info("Address updated successfully with ID: {}", addressId);
-//			return ResponseEntity.ok(updatedAddress);
-//		} catch (AddressNotFoundException addressNotFoundException) {
-//			logger.warn("Address not found for update with ID: {}", addressId);
-//			ErrorResponse errorResponse = new ErrorResponse(addressNotFoundException.getMessage());
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-//		}
+		try {
+			Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
+			logger.info("Address updated successfully with ID: {}", addressId);
+			return ResponseEntity.ok(updatedAddress);
+		} catch (AddressNotFoundException addressNotFoundException) {
+			logger.warn("Address not found for update with ID: {}", addressId);
+			ErrorResponse errorResponse = new ErrorResponse(addressNotFoundException.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+		}
 	}
 
 	@DeleteMapping("/{addressId}")

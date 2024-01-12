@@ -7,6 +7,7 @@ import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
 import com.example.demo.model.measurement.MeasuringUnitEnergyConsumption;
 import com.example.demo.service.DeviceService;
+import com.example.demo.service.MeasurementConsumptionService;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ public class MeasurementConsumptionControllerIntegrationTest {
 	private MeasurementConsumptionController measurementConsumptionController;
 
 	@Autowired
+	private MeasurementConsumptionService measurementConsumptionService;
+
+	@Autowired
 	private DeviceService deviceService;
 
 	private int tempNumberOfMeasurementConsumptionsInDatabase = 0;
@@ -54,7 +58,7 @@ public class MeasurementConsumptionControllerIntegrationTest {
 		System.out.println("NUMBER of measurements BEFORE : " +
 				measurementConsumptionController.getMeasurementConsumptionList().getBody().size());
 
-		measurementConsumptionController.deleteAllMeasurementConsumptions();
+		measurementConsumptionService.deleteAllMeasurementConsumptions();
 
 
 		System.out.println("NUMBER of measurements AFTER : " +
@@ -129,7 +133,6 @@ public class MeasurementConsumptionControllerIntegrationTest {
 		ResponseEntity<?> createResponse = measurementConsumptionController.createMeasurementConsumption(tempDevice.getId(), measurementDTO);
 
 		assertNotNull(createResponse.getBody());
-
 
 		assertThrows(MeasurementForThisMonthInYearExistsException.class, () -> {
 			measurementConsumptionController.createMeasurementConsumption(tempDevice.getId(), measurementDTO);

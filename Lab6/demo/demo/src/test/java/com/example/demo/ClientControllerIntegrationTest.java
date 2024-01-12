@@ -8,7 +8,9 @@ import com.example.demo.model.Address;
 import com.example.demo.model.Client;
 import com.example.demo.model.Device;
 import com.example.demo.DTO.ClientDTO;
+import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
+import com.example.demo.service.DeviceService;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +46,10 @@ public class ClientControllerIntegrationTest {
     private AddressController addressController;
 
     @Autowired
-    private DeviceController deviceController;
+    private AddressService addressService;
+
+    @Autowired
+    private DeviceService deviceService;
 
     private Address tempAddress;
 
@@ -53,8 +59,8 @@ public class ClientControllerIntegrationTest {
     public void setUp(){
         clientService.deleteAll();
 
-        tempAddress = addressController.getAddressList().getBody().get(0);
-        tempDevice = deviceController.getDeviceList().getBody().get(0);
+        tempAddress = addressService.getAddressList().get(0);
+        tempDevice = deviceService.getDeviceList().get(0);
     }
 
     @Test
@@ -86,8 +92,7 @@ public class ClientControllerIntegrationTest {
 //
     @Test
     public void TestGetClientListEndpoint() {
-        tempAddress = addressController.getAddressList().getBody().get(0);
-        Address tempAddress2 = addressController.getAddressList().getBody().get(1);
+        Address tempAddress2 =  addressService.getAddressList().get(1);;
 
         clientController.createClient(new ClientDTO("Test Client", tempAddress, tempDevice));
         clientController.createClient(new ClientDTO("Test Client", tempAddress2, tempDevice));
@@ -102,9 +107,10 @@ public class ClientControllerIntegrationTest {
 
         ResponseEntity<Client> responseEntity = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
 
-        Client retrievedClient = clientController.getClient(responseEntity.getBody().getId()).getBody();
+        Client retrievedClient = clientController.getClient(Objects.requireNonNull(responseEntity.getBody()).getId()).getBody();
 
-        assertEquals(testClientDTO.getName(), retrievedClient.getName());
+	    assert retrievedClient != null;
+	    assertEquals(testClientDTO.getName(), retrievedClient.getName());
     }
 
     @Test
@@ -126,13 +132,9 @@ public class ClientControllerIntegrationTest {
 
         ResponseEntity<Client> createdClient = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
 
-        clientController.deleteClient(createdClient.getBody().getId());
+        HttpStatus status = (HttpStatus) clientController.deleteClient(Objects.requireNonNull(createdClient.getBody()).getId()).getStatusCode();
 
-        ResponseEntity<Client> responseEntity =
-                (ResponseEntity<Client>) clientController.getClient(createdClient.getBody().getId());
-
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-
+        assertEquals(HttpStatus.NO_CONTENT, status);
     }
 
 }

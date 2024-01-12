@@ -16,6 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,7 +45,8 @@ public class AddressControllerIntegrationTest {
     }
 
     private void setTempNumberOfAddressesInDatabase(){
-        tempNumberOfAddressesInDatabase = addressController.getAddressList().getBody().size();
+
+        tempNumberOfAddressesInDatabase = addressService.getAddressList().size();
     }
 
     @Test
@@ -69,9 +71,10 @@ public class AddressControllerIntegrationTest {
         addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
         addressService.createAddress(new AddressDTO("Street Name 2", "Postal Code 2", "State 2"));
 
-        List<Address> addressList = addressController.getAddressList().getBody();
+        List<Address> addressList = addressService.getAddressList();
 
-        System.out.println("Address list size : " + addressList.size());
+	    assert addressList != null;
+	    System.out.println("Address list size : " + addressList.size());
 
         assertNotNull(addressList);
         assertEquals(tempNumberOfAddressesInDatabase + 2, addressList.size());

@@ -3,7 +3,7 @@ package com.example.demo.service;
 import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.exception.DeviceNotFoundException;
-import com.example.demo.exception.MeasurementForThisMonthAlreadyExistsException;
+import com.example.demo.exception.MeasurementForThisMonthInYearExistsException;
 import com.example.demo.mapper.DeviceMapper;
 import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
@@ -36,15 +36,19 @@ public class DeviceService {
         return this.deviceRepository.findAll();
     }
 
-    public Optional<Device> getDeviceById(UUID id){
-        return deviceRepository.findById(id);
+    public Device getDeviceById(UUID id){
+        return retrieveDevice(id);
     }
 
+    public Device retrieveDevice(UUID id){
+        return deviceRepository.findById(id)
+                .orElseThrow(() -> new DeviceNotFoundException(id));
+    }
 
     // UPDATE
 
-    public Device updateDevice(UUID deviceId, DeviceDTO deviceDTO) {
-        Optional<Device> optionalDevice = deviceRepository.findById(deviceId);
+    public Device updateDevice(UUID deviceID, DeviceDTO deviceDTO) {
+        Optional<Device> optionalDevice = deviceRepository.findById(deviceID);
 
         if(optionalDevice.isPresent()){
             Device deviceToUpdate = optionalDevice.get();
@@ -54,7 +58,7 @@ public class DeviceService {
             return deviceRepository.save(deviceToUpdate);
         }
         else
-            throw new DeviceNotFoundException("Device with this id not found.");
+            throw new DeviceNotFoundException(deviceID);
     }
 
     // DELETE
@@ -66,10 +70,8 @@ public class DeviceService {
     // OTHER
 
 
-    public Device measureNow(UUID deviceId) {
-        Optional<Device> optionalDevice = getDeviceById(deviceId);
-
-        Device device = optionalDevice.orElseThrow(() -> new DeviceNotFoundException("Device with this id not found."));
+    public Device measureNow(UUID deviceID) {
+        Device device = retrieveDevice(deviceID);
 
         device.measureConsumptionNow(1, 1000);
 
@@ -79,40 +81,35 @@ public class DeviceService {
     public void deleteAll(){ this.deviceRepository.deleteAll(); }
 
 
-    public Device measureForMonth(UUID deviceId, int month, int year) {
-        Optional<Device> optionalDevice = getDeviceById(deviceId);
+    public Device measureForMonth(UUID deviceID, int month, int year) {
+        Device device = retrieveDevice(deviceID);
 
-        Device device = optionalDevice.orElseThrow(() -> new DeviceNotFoundException("Device with this id not found."));
-
-        if(!isThereMeasurementForMonthInYear(deviceId, month, year)){
+        if(!isThereMeasurementForMonthInYear(deviceID, month, year)){
             device.measureConsumptionForMonth(month, 1, 1000);
             return deviceRepository.save(device);
         }
 
-        throw new MeasurementForThisMonthAlreadyExistsException(month);
+        throw new MeasurementForThisMonthInYearExistsException(month);
 
     }
 
-    public Device measureForDate(UUID deviceId, MeasurementConsumptionDTO requestDTO) {
-        Optional<Device> optionalDevice = getDeviceById(deviceId);
-
-        Device device = optionalDevice.orElseThrow(() -> new DeviceNotFoundException("Device with this id not found."));
+    public Device measureForDate(UUID deviceID, MeasurementConsumptionDTO requestDTO) {
+        Device device = retrieveDevice(deviceID);
 
         int month = DateUtils.getMonthFromDate(requestDTO.getMeasurementDate());
         int year = DateUtils.getYearFromDate(requestDTO.getMeasurementDate());
 
-        if(isThereMeasurementForMonthInYear(deviceId, month, year)){
-            throw new MeasurementForThisMonthAlreadyExistsException(month);
+        if(isThereMeasurementForMonthInYear(deviceID, month, year)){
+            throw new MeasurementForThisMonthInYearExistsException(month);
         }
 
-        device.createMeasurement(requestDTO, getDeviceById(deviceId).get());
+        device.createMeasurement(requestDTO, getDeviceById(deviceID));
         return deviceRepository.save(device);
     }
 
 
-    public boolean isThereMeasurementForMonthInYear(UUID deviceId, int month, int year){
-        Optional<Device> optionalDevice = getDeviceById(deviceId);
-        Device device = optionalDevice.orElseThrow(() -> new DeviceNotFoundException("Device with this id not found."));
+    public boolean isThereMeasurementForMonthInYear(UUID deviceID, int month, int year){
+        Device device = retrieveDevice(deviceID);
 
         if(device.getConsumptionsHistory() == null) return false;
 

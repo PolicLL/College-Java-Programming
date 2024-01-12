@@ -29,16 +29,9 @@ public class AddressController {
 
 	@PostMapping
 	public ResponseEntity<?> createAddress(@RequestBody AddressDTO addressDTO) {
-
-		try {
-			Address createdAddress = addressService.createAddress(addressDTO);
-			logger.info("Address created successfully with ID: {}", createdAddress.getId());
-			return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
-		} catch (InvalidInputException e) {
-			logger.error("Invalid input for creating address: {}", e.getMessage());
-			ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-		}
+		Address createdAddress = addressService.createAddress(addressDTO);
+		logger.info("Address created successfully with ID: {}", createdAddress.getId());
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
 	}
 
 	@GetMapping()
@@ -51,47 +44,35 @@ public class AddressController {
 		logger.info("Fetching address list with page={}, size={}, sort={}", page, size, String.join(",", sort));
 		Page<Address> addresses = addressService.getAddressPageWithSorting(page, size, sort);
 
-		if (addresses.isEmpty()) {
-			logger.warn("No addresses found");
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(addresses);
-		} else {
-			logger.info("Returning {} addresses", addresses.getTotalElements());
-			return ResponseEntity.ok(addresses);
-		}
+		logger.info("Returning {} addresses", addresses.getTotalElements());
+		return ResponseEntity.ok(addresses);
 	}
 
 	@GetMapping("/{addressId}")
 	public ResponseEntity<Address> getAddress(@PathVariable UUID addressId) {
 
-		logger.info("Fetching address with ID: {}", addressId);
-		Optional<Address> address = addressService.getAddressById(addressId);
-
-		if (address.isEmpty()) {
-			logger.warn("Address not found with ID: {}", addressId);
-			throw new AddressNotFoundException(addressId);
-		}
-
-		return address.map(tempAddress -> {
-			logger.info("Returning address with ID: {}", addressId);
-			return ResponseEntity.ok().body(tempAddress);
-		}).orElseGet(() -> {
-			logger.warn("Address not found with ID: {}", addressId);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		});
+		logger.info("Returning address with ID: {}", addressId);
+		Address address = addressService.getAddressById(addressId);
+		return ResponseEntity.ok().body(address);
 	}
+
 
 	@PutMapping("/{addressId}")
 	public ResponseEntity<?> updateAddress(@PathVariable UUID addressId, @RequestBody AddressDTO addressDTO) {
 
-		try {
-			Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
-			logger.info("Address updated successfully with ID: {}", addressId);
-			return ResponseEntity.ok(updatedAddress);
-		} catch (AddressNotFoundException addressNotFoundException) {
-			logger.warn("Address not found for update with ID: {}", addressId);
-			ErrorResponse errorResponse = new ErrorResponse(addressNotFoundException.getMessage());
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-		}
+		Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
+		logger.info("Address updated successfully with ID: {}", addressId);
+		return ResponseEntity.ok(updatedAddress);
+
+//		try {
+//			Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
+//			logger.info("Address updated successfully with ID: {}", addressId);
+//			return ResponseEntity.ok(updatedAddress);
+//		} catch (AddressNotFoundException addressNotFoundException) {
+//			logger.warn("Address not found for update with ID: {}", addressId);
+//			ErrorResponse errorResponse = new ErrorResponse(addressNotFoundException.getMessage());
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+//		}
 	}
 
 	@DeleteMapping("/{addressId}")

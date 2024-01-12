@@ -54,11 +54,8 @@ public class DeviceController {
 
     @GetMapping("/{deviceId}")
     public ResponseEntity<Device> getDevice(@PathVariable UUID deviceId) {
-        Optional<Device> device = deviceService.getDeviceById(deviceId);
-
-        return device.map(tempDevice -> ResponseEntity.ok().body(tempDevice))
-                        .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .build());
+        Device device = deviceService.getDeviceById(deviceId);
+        return ResponseEntity.ok().body(device);
     }
 
     // UPDATE

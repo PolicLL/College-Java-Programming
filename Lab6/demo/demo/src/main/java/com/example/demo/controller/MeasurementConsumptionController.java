@@ -30,13 +30,8 @@ public class MeasurementConsumptionController {
 
 	@PostMapping("/{deviceId}")
 	public ResponseEntity<?> createMeasurementConsumption(@PathVariable UUID deviceId, @RequestBody MeasurementConsumptionDTO measurementDTO) {
-		try {
-			MeasurementConsumption createdMeasurement = measurementConsumptionService.createMeasurementConsumption(measurementDTO, deviceId);
-			return ResponseEntity.status(HttpStatus.CREATED).body(createdMeasurement);
-		} catch (InvalidInputException e) {
-			ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-		}
+		MeasurementConsumption createdMeasurement = measurementConsumptionService.createMeasurementConsumption(measurementDTO, deviceId);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdMeasurement);
 	}
 
 	@GetMapping

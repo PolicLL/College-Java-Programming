@@ -4,7 +4,7 @@ import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.DTO.MeasurementConsumptionReport;
 import com.example.demo.exception.DeviceNotFoundException;
 import com.example.demo.exception.MeasurementConsumptionNotFoundException;
-import com.example.demo.exception.MeasurementForThisMonthAlreadyExistsException;
+import com.example.demo.exception.MeasurementForThisMonthInYearExistsException;
 import com.example.demo.mapper.MeasurementConsumptionMapper;
 import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
@@ -33,9 +33,7 @@ public class MeasurementConsumptionService {
 	}
 
 	public MeasurementConsumption createMeasurementConsumption(MeasurementConsumptionDTO measurementDTO, UUID deviceID) {
-		Optional<Device> optionalDevice = deviceService.getDeviceById(deviceID);
-
-		Device device = optionalDevice.orElseThrow(() -> new DeviceNotFoundException("Device with this id not found."));
+		Device device = deviceService.retrieveDevice(deviceID);
 
 		MeasurementConsumption newMeasurement = MeasurementConsumptionMapper.toMeasurementConsumption(measurementDTO, device);
 
@@ -46,7 +44,7 @@ public class MeasurementConsumptionService {
 			return measurementConsumptionRepository.save(newMeasurement);
 		}
 
-		throw new MeasurementForThisMonthAlreadyExistsException(month);
+		throw new MeasurementForThisMonthInYearExistsException(month);
 	}
 
 	public List<MeasurementConsumption> getMeasurementConsumptionList() {
@@ -57,18 +55,15 @@ public class MeasurementConsumptionService {
 		return measurementConsumptionRepository.findById(id);
 	}
 
-	public MeasurementConsumption updateMeasurementConsumption(UUID measurementId, MeasurementConsumptionDTO measurementDTO) {
-		Optional<MeasurementConsumption> optionalMeasurement = measurementConsumptionRepository.findById(measurementId);
+	public MeasurementConsumption updateMeasurementConsumption(UUID measurementID, MeasurementConsumptionDTO measurementDTO) {
+		MeasurementConsumption measurementToUpdate = retrieveMeasurementConsumption(measurementID);
+		measurementToUpdate.updateUsingDTO(measurementDTO);
+		return measurementConsumptionRepository.save(measurementToUpdate);
+	}
 
-		if (optionalMeasurement.isPresent()) {
-			MeasurementConsumption measurementToUpdate = optionalMeasurement.get();
-
-			measurementToUpdate.updateUsingDTO(measurementDTO);
-
-			return measurementConsumptionRepository.save(measurementToUpdate);
-		} else {
-			throw new MeasurementConsumptionNotFoundException("There is no measurement consumption with this id.");
-		}
+	private MeasurementConsumption retrieveMeasurementConsumption(UUID id){
+		return measurementConsumptionRepository.findById(id)
+				.orElseThrow(() -> new MeasurementConsumptionNotFoundException(id));
 	}
 
 	public void deleteMeasurementConsumption(UUID measurementId) {

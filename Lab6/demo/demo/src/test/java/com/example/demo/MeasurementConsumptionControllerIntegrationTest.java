@@ -2,7 +2,7 @@ package com.example.demo;
 
 import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.controller.MeasurementConsumptionController;
-import com.example.demo.exception.MeasurementForThisMonthAlreadyExistsException;
+import com.example.demo.exception.MeasurementForThisMonthInYearExistsException;
 import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
 import com.example.demo.model.measurement.MeasuringUnitEnergyConsumption;
@@ -131,7 +131,7 @@ public class MeasurementConsumptionControllerIntegrationTest {
 		assertNotNull(createResponse.getBody());
 
 
-		assertThrows(MeasurementForThisMonthAlreadyExistsException.class, () -> {
+		assertThrows(MeasurementForThisMonthInYearExistsException.class, () -> {
 			measurementConsumptionController.createMeasurementConsumption(tempDevice.getId(), measurementDTO);
 		});
 

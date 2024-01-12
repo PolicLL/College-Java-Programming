@@ -74,21 +74,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 	}
 
-	@ExceptionHandler(MeasurementForThisMonthAlreadyExistsException.class)
+	@ExceptionHandler(MeasurementForThisMonthInYearExistsException.class)
 	public ResponseEntity<?> handleMeasurementForThisMonthAlreadyExistsException(
-			MeasurementForThisMonthAlreadyExistsException ex, WebRequest request) {
+			MeasurementForThisMonthInYearExistsException ex, WebRequest request) {
 
 		logger.warn("Measurement for this month already exists", ex);
 		ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-	}
-
-	@ExceptionHandler(NotFoundException.class)
-	public ResponseEntity<?> handleNotFoundException(NotFoundException ex, WebRequest request) {
-
-		logger.warn("Resource not found", ex);
-		ErrorResponse errorResponse = new ErrorResponse(ex.getMessage());
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 	}
 
 	@ExceptionHandler(UnauthorizedException.class)

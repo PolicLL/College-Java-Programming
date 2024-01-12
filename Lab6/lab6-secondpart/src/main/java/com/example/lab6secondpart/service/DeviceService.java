@@ -6,6 +6,8 @@ import com.example.lab6secondpart.model.Client;
 import com.example.lab6secondpart.model.Device;
 import com.example.lab6secondpart.model.MeasurementConsumption;
 import com.example.lab6secondpart.utils.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-
 public class DeviceService {
+
+	private final Logger logger = LoggerFactory.getLogger(DeviceService.class);
 
 	private final RestTemplate restTemplate;
 
@@ -26,6 +29,7 @@ public class DeviceService {
 	}
 
 	public List<Device> getAllDevices() {
+		logger.info("Fetching all devices");
 
 		final String ENDPOINT = "http://localhost:8080/device";
 
@@ -52,6 +56,8 @@ public class DeviceService {
 	}
 
 	public MeasurementConsumption createMeasurement(UUID deviceId, MeasurementConsumption measurementDTO) {
+		logger.info("Creating measurement for device with ID: {}", deviceId);
+
 		final String ENDPOINT = "http://localhost:8080/device/" + deviceId + "/measure";
 
 		if(measurementDTO.getMeasurementDate() == null){
@@ -75,12 +81,13 @@ public class DeviceService {
 		}
 
 		throw new DeviceNotFoundException(deviceId);
-
 	}
 
 	// get client by device id
 
 	public Client getClientByDeviceId(UUID deviceId) {
+		logger.info("Fetching client by device ID: {}", deviceId);
+
 		final String ENDPOINT = "http://localhost:8080/client/byDevice/" + deviceId;
 
 		HttpHeaders headers = new HttpHeaders();
@@ -104,6 +111,8 @@ public class DeviceService {
 	}
 
 	public List<MeasurementConsumption> getAllMeasurementsForDevice(UUID deviceId) {
+		logger.info("Fetching all measurements for device with ID: {}", deviceId);
+
 		final String ENDPOINT = "http://localhost:8080/measurement-consumption/byDevice/" + deviceId;
 
 		ResponseEntity<List<MeasurementConsumption>> response = restTemplate.exchange(
@@ -120,6 +129,4 @@ public class DeviceService {
 			return Collections.emptyList();
 		}
 	}
-
-
 }

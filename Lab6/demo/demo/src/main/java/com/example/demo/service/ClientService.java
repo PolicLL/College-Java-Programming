@@ -60,7 +60,7 @@ public class ClientService {
 
             return clientRepository.save(clientToUpdate);
         } else {
-            throw new ClientNotFoundException("There is no client with this id.");
+            throw new ClientNotFoundException(clientID);
         }
     }
 

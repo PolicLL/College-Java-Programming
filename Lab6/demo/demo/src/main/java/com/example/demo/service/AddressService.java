@@ -1,14 +1,21 @@
 package com.example.demo.service;
 
 import com.example.demo.DTO.AddressDTO;
+import com.example.demo.controller.AddressController;
 import com.example.demo.exception.AddressNotFoundException;
+import com.example.demo.exception.InvalidInputException;
+import com.example.demo.exception.response.ErrorResponse;
 import com.example.demo.mapper.AddressMapper;
 import com.example.demo.model.Address;
 import com.example.demo.repository.AddressRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,13 +28,14 @@ public class AddressService {
 
 	private final AddressRepository addressRepository;
 
+	private static final Logger logger = LoggerFactory.getLogger(AddressController.class);
+
 	public AddressService(AddressRepository addressRepository) {
 
 		this.addressRepository = addressRepository;
 	}
 
 	public Address createAddress(AddressDTO addressDTO) {
-
 		Address newAddress = AddressMapper.toAddress(addressDTO);
 		addressRepository.save(newAddress);
 		return newAddress;
@@ -58,24 +66,20 @@ public class AddressService {
 		return addressRepository.findAll();
 	}
 
-	public Optional<Address> getAddressById(UUID id) {
-
-		return addressRepository.findById(id);
+	public Address getAddressById(UUID id) {
+		return requireAddress(id);
 	}
 
+
 	public Address updateAddress(UUID addressId, AddressDTO addressDTO) {
+		Address address = requireAddress(addressId);
+		address.updateUsingDTO(addressDTO);
+		return addressRepository.save(address);
+	}
 
-		Optional<Address> optionalAddress = addressRepository.findById(addressId);
-
-		if (optionalAddress.isPresent()) {
-			Address addressToUpdate = optionalAddress.get();
-
-			addressToUpdate.updateUsingDTO(addressDTO);
-
-			return addressRepository.save(addressToUpdate);
-		} else {
-			throw new AddressNotFoundException(addressId);
-		}
+	private Address requireAddress(UUID addressID){
+		return addressRepository.findById(addressID)
+				.orElseThrow(() -> new AddressNotFoundException(addressID));
 	}
 
 	public void deleteAddress(UUID addressId) {

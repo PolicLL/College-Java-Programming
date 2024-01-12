@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Measurement</title>
+    <!-- Add your styling and CSS -->
+</head>
+<body>
+<h1>Add Measurement for Device: <span th:text="${deviceName}"></span></h1>
+<form th:action="@{'/device/' + ${deviceId} + '/save-measurement'}" method="post" class="measurement-form" th:object="${measurementDTO}">
+    <!-- Your form fields here -->
+    <div class="form-group">
+        <label for="measurementDate">Measurement Date</label>
+        <input type="date" id="measurementDate" name="measurementDate" th:field="*{measurementDate}" pattern="yyyy-MM-dd" required>
+    </div>
+    <div class="form-group">
+        <label for="measurementValue">Measurement Value</label>
+        <input type="text" id="measurementValue" name="measurementValue" th:field="*{measurementValue}" required>
+    </div>
+    <div class="form-group">
+        <label for="measuringUnit">Measuring Unit</label>
+        <select id="measuringUnit" name="measuringUnit" th:field="*{measuringUnitEnergyConsumption}">
+            <option th:each="unit : ${measuringUnits}" th:value="${unit}" th:text="${unit.label}"></option>
+        </select>
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

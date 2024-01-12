@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Device List</title>
+    <style>
+        /* Basic CSS for styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .add-measurement-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Device List</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Client</th>
+        <th>All Measurements</th>
+        <!-- Add other device attributes as needed -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="device : ${devices}">
+        <td th:text="${device.id}"></td>
+        <td th:text="${device.name}"></td>
+        <td th:text="${device.client.name}"></td>
+        <td>
+            <a th:href="@{'/device/' + ${device.id} + '/add-measurement'}" class="add-measurement-button">
+                <button>Add Measurement</button>
+            </a>
+        </td>
+        <td>
+            <a th:href="@{'/device/measurements/' + ${device.id}}">See Measurements</a>
+
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

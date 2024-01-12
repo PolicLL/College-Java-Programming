@@ -63,6 +63,16 @@ public class MeasurementConsumptionController {
 				});
 	}
 
+	@GetMapping("/byDevice/{deviceId}")
+	public ResponseEntity<List<MeasurementConsumption>> getAllMeasurementsForDevice(@PathVariable UUID deviceId) {
+		List<MeasurementConsumption> measurements = measurementConsumptionService.getAllMeasurementsForDevice(deviceId);
+
+		return measurements.isEmpty()
+				? ResponseEntity.status(HttpStatus.NOT_FOUND).body(measurements)
+				: ResponseEntity.ok(measurements);
+	}
+
+
 	@GetMapping("/year/month")
 	public ResponseEntity<MeasurementConsumptionReport> getMeasurementConsumptionListForYearForMonth(
 			@RequestParam(name = "year") int year,

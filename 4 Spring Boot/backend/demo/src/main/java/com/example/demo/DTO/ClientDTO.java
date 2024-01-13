@@ -12,10 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ClientDTO {
     private String name;
-    private Address address;
-    private Device device;
+    private AddressDTO address;
+    private DeviceDTO device;
 
-    public ClientDTO(String name, Address address, Device device) {
+    public ClientDTO(String name, AddressDTO address, DeviceDTO device) {
         this.name = name;
         this.address = address;
         this.device = device;

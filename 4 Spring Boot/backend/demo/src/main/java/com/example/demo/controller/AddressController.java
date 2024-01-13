@@ -31,13 +31,13 @@ public class AddressController {
 	@PostMapping
 	public ResponseEntity<?> createAddress(@RequestBody AddressDTO addressDTO) {
 
-		Address createdAddress = addressService.createAddress(addressDTO);
+		AddressDTO createdAddress = addressService.createAddress(addressDTO);
 		logger.info("Address created successfully with ID: {}", createdAddress.getId());
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdAddress);
 	}
 
 	@GetMapping()
-	public ResponseEntity<Page<Address>> getAddressList(
+	public ResponseEntity<Page<AddressDTO>> getAddressList(
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "3") int size,
 			@RequestParam(defaultValue = "id,asc") String[] sort
@@ -45,7 +45,7 @@ public class AddressController {
 
 		logger.info("Fetching address list with page={}, size={}, sort={}", page, size, String.join(",", sort));
 
-		Page<Address> addresses = addressService.getAddressPageWithSorting(page, size, sort);
+		Page<AddressDTO> addresses = addressService.getAddressPageWithSorting(page, size, sort);
 
 		return addresses.getContent().stream()
 				.findFirst()
@@ -60,7 +60,7 @@ public class AddressController {
 	}
 
 	@GetMapping("/{addressId}")
-	public ResponseEntity<Address> getAddress(@PathVariable UUID addressId) {
+	public ResponseEntity<AddressDTO> getAddress(@PathVariable UUID addressId) {
 
 		logger.info("Returning address with ID: {}", addressId);
 
@@ -73,7 +73,7 @@ public class AddressController {
 	@PutMapping("/{addressId}")
 	public ResponseEntity<?> updateAddress(@PathVariable UUID addressId, @RequestBody AddressDTO addressDTO) {
 
-		Address updatedAddress = addressService.updateAddress(addressId, addressDTO);
+		AddressDTO updatedAddress = addressService.updateAddress(addressId, addressDTO);
 		logger.info("Address updated successfully with ID: {}", addressId);
 		return ResponseEntity.ok(updatedAddress);
 	}

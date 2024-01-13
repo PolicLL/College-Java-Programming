@@ -23,4 +23,15 @@ public class DateUtils {
 
 		return calendar.get(Calendar.YEAR) + 1;
 	}
+
+	public static Date createDateWithMonth(int targetMonth) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.MONTH, targetMonth - 1); // Subtract 1 as months are zero-based
+
+		// Set the year to the current year (you might want to adjust if you need a different year)
+		int currentYear = calendar.get(Calendar.YEAR);
+		calendar.set(Calendar.YEAR, currentYear);
+
+		return calendar.getTime();
+	}
 }

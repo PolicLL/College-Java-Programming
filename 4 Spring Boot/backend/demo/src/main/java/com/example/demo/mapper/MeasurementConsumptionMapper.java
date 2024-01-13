@@ -1,11 +1,27 @@
 package com.example.demo.mapper;
 
+import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.DTO.MeasurementConsumptionDTO;
-import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public class MeasurementConsumptionMapper {
-	public static MeasurementConsumption toMeasurementConsumption(MeasurementConsumptionDTO dto, Device device) {
-		return new MeasurementConsumption(device, dto.getMeasurementDate(), dto.getMeasuringUnitEnergyConsumption(), dto.getMeasurementValue());
+import java.util.UUID;
+
+@Mapper(componentModel = "spring")
+public interface MeasurementConsumptionMapper {
+
+	MeasurementConsumptionMapper INSTANCE = Mappers.getMapper(MeasurementConsumptionMapper.class);
+
+	@Mapping(target = "id", ignore = true)
+	@Mapping(target = "device", ignore = true)
+	@Mapping(target = "device.id", source = "deviceID")
+	MeasurementConsumption toMeasurementConsumption(MeasurementConsumptionDTO measurementDTO);
+
+	MeasurementConsumptionDTO toMeasurementConsumptionDTO(MeasurementConsumption measurementConsumption);
+
+	default UUID mapDeviceID(DeviceDTO deviceDTO) {
+		return deviceDTO != null ? deviceDTO.getId() : null;
 	}
 }

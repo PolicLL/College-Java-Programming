@@ -1,8 +1,9 @@
 package com.example.demo;
 
+import com.example.demo.DTO.AddressDTO;
+import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.controller.AddressController;
 import com.example.demo.controller.ClientController;
-import com.example.demo.controller.DeviceController;
 import com.example.demo.exception.ClientAlreadyExistsWithAddressException;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
@@ -10,7 +11,7 @@ import com.example.demo.model.Device;
 import com.example.demo.DTO.ClientDTO;
 import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
-import com.example.demo.service.DeviceService;
+import com.example.demo.service.implementation.DeviceServiceImpl;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,18 +50,18 @@ public class ClientControllerIntegrationTest {
     private AddressService addressService;
 
     @Autowired
-    private DeviceService deviceService;
+    private DeviceServiceImpl deviceServiceImpl;
 
-    private Address tempAddress;
+    private AddressDTO tempAddress;
 
-    private Device tempDevice;
+    private DeviceDTO tempDevice;
 
     @BeforeEach
     public void setUp(){
         clientService.deleteAll();
 
         tempAddress = addressService.getAddressList().get(0);
-        tempDevice = deviceService.getDeviceList().get(0);
+        tempDevice = deviceServiceImpl.getDeviceList().get(0);
     }
 
     @Test
@@ -73,7 +74,7 @@ public class ClientControllerIntegrationTest {
         assertNotNull(responseEntity.getBody());
         assertEquals("Test Client", responseEntity.getBody().getName());
 
-        List<Client> clients = clientService.getClientList();
+        List<ClientDTO> clients = clientService.getClientList();
         assertEquals(1, clients.size());
         assertEquals("Test Client", clients.get(0).getName());
     }
@@ -92,12 +93,12 @@ public class ClientControllerIntegrationTest {
 //
     @Test
     public void TestGetClientListEndpoint() {
-        Address tempAddress2 =  addressService.getAddressList().get(1);;
+        AddressDTO tempAddress2 =  addressService.getAddressList().get(1);;
 
         clientController.createClient(new ClientDTO("Test Client", tempAddress, tempDevice));
         clientController.createClient(new ClientDTO("Test Client", tempAddress2, tempDevice));
 
-        ResponseEntity<List<Client>> responseEntity = clientController.getClientList();
+        ResponseEntity<List<ClientDTO>> responseEntity = clientController.getClientList();
 
         assertEquals(2, responseEntity.getBody().size());
     }
@@ -107,7 +108,7 @@ public class ClientControllerIntegrationTest {
 
         ResponseEntity<Client> responseEntity = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
 
-        Client retrievedClient = clientController.getClient(Objects.requireNonNull(responseEntity.getBody()).getId()).getBody();
+        ClientDTO retrievedClient = clientController.getClient(Objects.requireNonNull(responseEntity.getBody()).getId()).getBody();
 
 	    assert retrievedClient != null;
 	    assertEquals(testClientDTO.getName(), retrievedClient.getName());

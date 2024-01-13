@@ -2,28 +2,26 @@ package com.example.demo.mapper;
 
 import com.example.demo.DTO.AddressDTO;
 import com.example.demo.model.Address;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 
-public class AddressMapper {
+@Mapper(componentModel = "spring")
+public interface AddressMapper {
+    AddressMapper INSTANCE = Mappers.getMapper(AddressMapper.class);
 
-    public static AddressDTO toAddressRequest(Address address) {
-        AddressDTO addressDTO = new AddressDTO();
+    @Mapping(target = "id", ignore = true)
+    Address toAddress(AddressDTO addressDTO);
 
-        addressDTO.setStreetName(address.getStreetName());
-        addressDTO.setPostalCode(address.getPostalCode());
-        addressDTO.setState(address.getState());
-        // Map other fields if needed
-        return addressDTO;
-    }
+    AddressDTO toAddressDTO(Address address);
 
-    public static Address toAddress(AddressDTO addressRequest) {
-        Address address = new Address();
+    void updateAddressFromDTO(AddressDTO addressDTO, @org.mapstruct.MappingTarget Address address);
 
-        Optional.ofNullable(addressRequest.getPostalCode()).ifPresent(address::setPostalCode);
-        Optional.ofNullable(addressRequest.getState()).ifPresent(address::setState);
-        Optional.ofNullable(addressRequest.getStreetName()).ifPresent(address::setStreetName);
-
-        return address;
+    // New method to map Page<Address> to Page<AddressDTO>
+    default Page<AddressDTO> toPageAddressDTO(Page<Address> page) {
+        return page.map(this::toAddressDTO);
     }
 }

@@ -2,15 +2,16 @@ package com.example.demo.service;
 
 import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.DTO.MeasurementConsumptionReport;
-import com.example.demo.exception.DeviceNotFoundException;
 import com.example.demo.exception.MeasurementConsumptionNotFoundException;
 import com.example.demo.exception.MeasurementForThisMonthInYearExistsException;
 import com.example.demo.mapper.MeasurementConsumptionMapper;
 import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
 import com.example.demo.repository.MeasurementConsumptionRepository;
+import com.example.demo.service.implementation.DeviceServiceImpl;
 import com.example.demo.utils.DateUtils;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,27 +21,25 @@ import java.util.*;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MeasurementConsumptionService {
 
 	private final MeasurementConsumptionRepository measurementConsumptionRepository;
 
-	private final DeviceService deviceService;
+	private final DeviceServiceImpl deviceServiceImpl;
 
-	@Autowired
-	public MeasurementConsumptionService(MeasurementConsumptionRepository measurementConsumptionRepository, DeviceService deviceService) {
-		this.measurementConsumptionRepository = measurementConsumptionRepository;
-		this.deviceService = deviceService;
-	}
+	private MeasurementConsumptionMapper measurementConsumptionMapper;
 
 	public MeasurementConsumption createMeasurementConsumption(MeasurementConsumptionDTO measurementDTO, UUID deviceID) {
-		Device device = deviceService.retrieveDevice(deviceID);
 
-		MeasurementConsumption newMeasurement = MeasurementConsumptionMapper.toMeasurementConsumption(measurementDTO, device);
+		measurementDTO.setDeviceID(deviceID);
+		MeasurementConsumption newMeasurement = measurementConsumptionMapper.toMeasurementConsumption(measurementDTO);
+
 
 		int month = DateUtils.getMonthFromDate(measurementDTO.getMeasurementDate());
 		int year = DateUtils.getYearFromDate(measurementDTO.getMeasurementDate());
 
-		if(!deviceService.isThereMeasurementForMonthInYear(deviceID, month, year)){
+		if(!deviceServiceImpl.isThereMeasurementForMonthInYear(deviceID, month, year)){
 			return measurementConsumptionRepository.save(newMeasurement);
 		}
 

@@ -1,12 +1,13 @@
 package com.example.demo;
 
+import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.controller.MeasurementConsumptionController;
 import com.example.demo.exception.MeasurementForThisMonthInYearExistsException;
 import com.example.demo.model.Device;
 import com.example.demo.model.measurement.MeasurementConsumption;
 import com.example.demo.model.measurement.MeasuringUnitEnergyConsumption;
-import com.example.demo.service.DeviceService;
+import com.example.demo.service.implementation.DeviceServiceImpl;
 import com.example.demo.service.MeasurementConsumptionService;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,11 +43,11 @@ public class MeasurementConsumptionControllerIntegrationTest {
 	private MeasurementConsumptionService measurementConsumptionService;
 
 	@Autowired
-	private DeviceService deviceService;
+	private DeviceServiceImpl deviceServiceImpl;
 
 	private int tempNumberOfMeasurementConsumptionsInDatabase = 0;
 
-	private Device tempDevice;
+	private DeviceDTO tempDevice;
 
 	private MeasurementConsumptionDTO measurementDTO;
 
@@ -64,7 +65,7 @@ public class MeasurementConsumptionControllerIntegrationTest {
 		System.out.println("NUMBER of measurements AFTER : " +
 				measurementConsumptionController.getMeasurementConsumptionList().getBody().size());
 
-		tempDevice = deviceService.getDeviceList().get(0);
+		tempDevice = deviceServiceImpl.getDeviceList().get(0);
 		currentDate = Date.valueOf(java.time.LocalDate.now());
 		measurementDTO = new MeasurementConsumptionDTO(currentDate, MeasuringUnitEnergyConsumption.kWh, 100.0);
 	}

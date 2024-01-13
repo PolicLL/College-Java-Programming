@@ -30,15 +30,15 @@ public class ClientController {
 	@PostMapping
 	public ResponseEntity<?> createClient(@RequestBody ClientDTO clientDTO) {
 
-		Client createdClient = clientService.createClient(clientDTO);
+		ClientDTO createdClient = clientService.createClient(clientDTO);
 		logger.info("Client created: " + createdClient.toString());
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<Client>> getClientList() {
+	public ResponseEntity<List<ClientDTO>> getClientList() {
 
-		List<Client> clients = clientService.getClientList();
+		List<ClientDTO> clients = clientService.getClientList();
 		logger.info("Retrieved client list: " + clients.toString());
 
 		return clients.stream()
@@ -48,7 +48,7 @@ public class ClientController {
 	}
 
 	@GetMapping("/{clientId}")
-	public ResponseEntity<Client> getClient(@PathVariable UUID clientId) {
+	public ResponseEntity<ClientDTO> getClient(@PathVariable UUID clientId) {
 
 		return Optional.ofNullable(clientService.getClientById(clientId))
 				.map(client -> {
@@ -61,7 +61,7 @@ public class ClientController {
 	@PutMapping("/{clientId}")
 	public ResponseEntity<?> updateClient(@PathVariable UUID clientId, @RequestBody ClientDTO clientDTO) {
 
-		Client updatedClient = clientService.updateClient(clientId, clientDTO);
+		ClientDTO updatedClient = clientService.updateClient(clientId, clientDTO);
 		logger.info("Client updated: " + updatedClient.toString());
 		return ResponseEntity.ok(updatedClient);
 	}
@@ -75,9 +75,9 @@ public class ClientController {
 	}
 
 	@GetMapping("/byDevice/{deviceId}")
-	public ResponseEntity<Client> getClientsByDeviceId(@PathVariable UUID deviceId) {
+	public ResponseEntity<ClientDTO> getClientsByDeviceId(@PathVariable UUID deviceId) {
 
-		Client client = clientService.getClientsByDeviceId(deviceId);
+		ClientDTO client = clientService.getClientsByDeviceId(deviceId);
 		logger.info("Retrieved client by device ID: " + deviceId.toString());
 
 		return Optional.ofNullable(clientService.getClientsByDeviceId(deviceId))

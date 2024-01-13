@@ -1,9 +1,8 @@
 package com.example.demo.model;
 
 import com.example.demo.DTO.DeviceDTO;
-import com.example.demo.DTO.MeasurementConsumptionDTO;
-import com.example.demo.mapper.MeasurementConsumptionMapper;
 import com.example.demo.model.measurement.MeasurementConsumption;
+import com.example.demo.utils.DateUtils;
 import com.example.demo.utils.RandomValueGenerator;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -35,11 +34,8 @@ public class Device {
         this.consumptionsHistory = new ArrayList<>();
     }
 
-    public void measureConsumptionBefore(double startRange, double endRange){
-        consumptionsHistory.add(generateMeasurement(startRange, endRange, RandomValueGenerator.generateRandomDate()));
-    }
 
-    public void measureConsumptionNow(double startRange, double endRange){
+    public void generateMeasurementNow(double startRange, double endRange){
         consumptionsHistory.add(generateMeasurement(startRange, endRange, new Date()));
     }
 
@@ -48,32 +44,13 @@ public class Device {
         return new MeasurementConsumption(this, measureDate, randomValue);
     }
 
-    public void updateUsingDTO(DeviceDTO deviceDTO) {
-        if(deviceDTO.getName() != null) this.setName(deviceDTO.getName());
-    }
-
-
     public void measureConsumptionForMonth(int month, double startRange, double endRange) {
         double randomValue = RandomValueGenerator.generateRandomValue(startRange, endRange);
-        consumptionsHistory.add(new MeasurementConsumption(this, createDateWithMonth(month), randomValue));
+        consumptionsHistory.add(new MeasurementConsumption(this, DateUtils.createDateWithMonth(month), randomValue));
     }
 
-    public void measureConsumptionForMonth(Date date, double value) {
-        consumptionsHistory.add(new MeasurementConsumption(this, date));
+    public void addMeasurement(MeasurementConsumption measurementConsumption) {
+        consumptionsHistory.add(measurementConsumption);
     }
 
-    public void createMeasurement(MeasurementConsumptionDTO measurementConsumptionDTO, Device device) {
-        consumptionsHistory.add(MeasurementConsumptionMapper.toMeasurementConsumption(measurementConsumptionDTO, device));
-    }
-
-    public static Date createDateWithMonth(int targetMonth) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.MONTH, targetMonth - 1); // Subtract 1 as months are zero-based
-
-        // Set the year to the current year (you might want to adjust if you need a different year)
-        int currentYear = calendar.get(Calendar.YEAR);
-        calendar.set(Calendar.YEAR, currentYear);
-
-        return calendar.getTime();
-    }
 }

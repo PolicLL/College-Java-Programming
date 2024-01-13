@@ -5,12 +5,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddressDTO {
+    private UUID id;
     private String streetName;
     private String postalCode;
     private String state;
+
+    public AddressDTO(String streetName, String postalCode, String state) {
+
+        this.streetName = streetName;
+        this.postalCode = postalCode;
+        this.state = state;
+    }
+
 }

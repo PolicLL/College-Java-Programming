@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -17,6 +19,13 @@ public class MeasurementConsumptionDTO {
 	private Date measurementDate;
 	private MeasuringUnitEnergyConsumption measuringUnitEnergyConsumption;
 	private double measurementValue;
+	private UUID deviceID;
 
-	// Getters and setters
+	public MeasurementConsumptionDTO(Date measurementDate, MeasuringUnitEnergyConsumption measuringUnitEnergyConsumption, double measurementValue) {
+
+		this.measurementDate = measurementDate;
+		this.measuringUnitEnergyConsumption = measuringUnitEnergyConsumption;
+		this.measurementValue = measurementValue;
+	}
+
 }

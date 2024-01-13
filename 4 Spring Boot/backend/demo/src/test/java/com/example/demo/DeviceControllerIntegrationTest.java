@@ -3,7 +3,7 @@ package com.example.demo;
 import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.controller.DeviceController;
 import com.example.demo.model.Device;
-import com.example.demo.service.DeviceService;
+import com.example.demo.service.implementation.DeviceServiceImpl;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,14 +33,14 @@ public class DeviceControllerIntegrationTest {
 
 
     @Autowired
-    private DeviceService deviceService;
+    private DeviceServiceImpl deviceServiceImpl;
 
     @Autowired
     private DeviceController deviceController;
 
     @BeforeEach
     public void setUp(){
-        deviceService.deleteAll();
+        deviceServiceImpl.deleteAll();
     }
 
     @Test
@@ -52,7 +52,7 @@ public class DeviceControllerIntegrationTest {
         assertNotNull(responseEntity.getBody());
         assertEquals("Device 1", responseEntity.getBody().getName());
 
-        List<Device> deviceList = deviceService.getDeviceList();
+        List<DeviceDTO> deviceList = deviceServiceImpl.getDeviceList();
         assertEquals(1, deviceList.size());
         assertEquals("Device 1", deviceList.get(0).getName());
 
@@ -61,10 +61,10 @@ public class DeviceControllerIntegrationTest {
 
     @Test
     public void testGetAllDevices() {
-        deviceService.createDevice(new DeviceDTO("Device 1"));
-        deviceService.createDevice(new DeviceDTO("Device 2"));
+        deviceServiceImpl.createDevice(new DeviceDTO("Device 1"));
+        deviceServiceImpl.createDevice(new DeviceDTO("Device 2"));
 
-        List<Device> deviceList = deviceController.getDeviceList().getBody();
+        List<DeviceDTO> deviceList = deviceController.getDeviceList().getBody();
 
         assertNotNull(deviceList);
         assertEquals(2, deviceList.size());
@@ -75,18 +75,18 @@ public class DeviceControllerIntegrationTest {
 
     @Test
     public void testGetDeviceById() {
-        Device newDevice = deviceService.createDevice(new DeviceDTO("Device 1"));
-        Device gettedDevice = deviceController.getDevice(newDevice.getId()).getBody();
+        DeviceDTO newDevice = deviceServiceImpl.createDevice(new DeviceDTO("Device 1"));
+        DeviceDTO gotDevice = deviceController.getDevice(newDevice.getId()).getBody();
 
-        assertNotNull(gettedDevice);
-        assertEquals("Device 1", gettedDevice.getName());
+        assertNotNull(gotDevice);
+        assertEquals("Device 1", gotDevice.getName());
     }
 
 
 
     @Test
     public void testUpdateDevice() {
-        Device newDevice = deviceService.createDevice(new DeviceDTO("Device 1"));
+        DeviceDTO newDevice = deviceServiceImpl.createDevice(new DeviceDTO("Device 1"));
 
         DeviceDTO deviceDTO = new DeviceDTO("Updated Name");
 
@@ -99,7 +99,7 @@ public class DeviceControllerIntegrationTest {
 
     @Test
     public void testDeleteDevice() {
-        Device newDevice = deviceService.createDevice(new DeviceDTO("Device 1"));
+        DeviceDTO newDevice = deviceServiceImpl.createDevice(new DeviceDTO("Device 1"));
 
         HttpStatus status = (HttpStatus) deviceController.deleteDevice(newDevice.getId()).getStatusCode();
 

@@ -5,11 +5,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceDTO {
     private String name;
-    // Other fields needed for creating a device, excluding generated fields like ID
+    private UUID id;
+
+    public DeviceDTO(String name) {
+
+        this.name = name;
+    }
+
 }

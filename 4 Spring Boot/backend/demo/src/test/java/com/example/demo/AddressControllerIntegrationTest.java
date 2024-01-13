@@ -59,7 +59,7 @@ public class AddressControllerIntegrationTest {
         assertNotNull(responseEntity.getBody());
         assertEquals("Street Name 1", responseEntity.getBody().getStreetName());
 
-        Address address = addressController.getAddress(responseEntity.getBody().getId()).getBody();
+        AddressDTO address = addressController.getAddress(responseEntity.getBody().getId()).getBody();
 	    assert address != null;
 	    assertEquals("Street Name 1", address.getStreetName());
     }
@@ -71,7 +71,7 @@ public class AddressControllerIntegrationTest {
         addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
         addressService.createAddress(new AddressDTO("Street Name 2", "Postal Code 2", "State 2"));
 
-        List<Address> addressList = addressService.getAddressList();
+        List<AddressDTO> addressList = addressService.getAddressList();
 
 	    assert addressList != null;
 	    System.out.println("Address list size : " + addressList.size());
@@ -83,8 +83,8 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testGetAddressById() {
 
-        Address newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
-        Address gettedAddress = addressController.getAddress(newAddress.getId()).getBody();
+        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
+        AddressDTO gettedAddress = addressController.getAddress(newAddress.getId()).getBody();
 
         assertNotNull(gettedAddress);
         assertEquals("Street Name 1", gettedAddress.getStreetName());
@@ -93,7 +93,7 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testUpdateAddress() {
 
-        Address newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
+        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
 
         AddressDTO addressDTO = new AddressDTO("Updated Address", "Updated Postal Code", "Updated State");
 
@@ -108,7 +108,7 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testDeleteAddress() {
 
-        Address newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
+        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
 
         HttpStatus status = (HttpStatus) addressController.deleteAddress(newAddress.getId()).getStatusCode();
 

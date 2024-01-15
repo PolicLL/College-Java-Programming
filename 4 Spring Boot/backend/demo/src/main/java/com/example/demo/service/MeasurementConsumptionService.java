@@ -26,7 +26,7 @@ public class MeasurementConsumptionService {
 
 	private final MeasurementConsumptionRepository measurementConsumptionRepository;
 
-	private final DeviceServiceImpl deviceServiceImpl;
+	private final DeviceService deviceServiceImpl;
 
 	private MeasurementConsumptionMapper measurementConsumptionMapper;
 

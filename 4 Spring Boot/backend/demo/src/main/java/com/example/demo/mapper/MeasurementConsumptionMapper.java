@@ -6,9 +6,11 @@ import com.example.demo.model.measurement.MeasurementConsumption;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 @Mapper(componentModel = "spring")
 public interface MeasurementConsumptionMapper {
 

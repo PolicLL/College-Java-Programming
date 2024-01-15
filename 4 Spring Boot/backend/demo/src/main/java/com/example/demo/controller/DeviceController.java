@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.DTO.DeviceDTO;
 import com.example.demo.DTO.MeasurementConsumptionDTO;
 import com.example.demo.model.Device;
+import com.example.demo.service.DeviceService;
 import com.example.demo.service.implementation.DeviceServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class DeviceController {
 
-	private final DeviceServiceImpl deviceServiceImpl;
+	private final DeviceService deviceServiceImpl;
 
 	private static final Logger logger = Logger.getLogger(DeviceController.class.getName());
 

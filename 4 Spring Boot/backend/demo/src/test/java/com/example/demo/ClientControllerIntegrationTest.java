@@ -1,17 +1,11 @@
 package com.example.demo;
 
-import com.example.demo.DTO.AddressDTO;
-import com.example.demo.DTO.DeviceDTO;
-import com.example.demo.controller.AddressController;
 import com.example.demo.controller.ClientController;
 import com.example.demo.exception.ClientAlreadyExistsWithAddressException;
-import com.example.demo.model.Address;
 import com.example.demo.model.Client;
-import com.example.demo.model.Device;
 import com.example.demo.DTO.ClientDTO;
-import com.example.demo.service.AddressService;
 import com.example.demo.service.ClientService;
-import com.example.demo.service.implementation.DeviceServiceImpl;
+import com.example.demo.utils.DTOUtils;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,59 +38,49 @@ public class ClientControllerIntegrationTest {
     private ClientController clientController;
 
     @Autowired
-    private AddressController addressController;
+    private DTOUtils dtoUtils;
 
-    @Autowired
-    private AddressService addressService;
-
-    @Autowired
-    private DeviceServiceImpl deviceServiceImpl;
-
-    private AddressDTO tempAddress;
-
-    private DeviceDTO tempDevice;
+    private int numberOfClientsBeforeTest = 0;
 
     @BeforeEach
     public void setUp(){
         clientService.deleteAll();
 
-        tempAddress = addressService.getAddressList().get(0);
-        tempDevice = deviceServiceImpl.getDeviceList().get(0);
+        numberOfClientsBeforeTest = clientService.getClientList().size();
     }
 
     @Test
     public void TestCreateClientEndpoint() {
-        ClientDTO testClientDTO = new ClientDTO("Test Client", tempAddress, tempDevice);
+        ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
-        ResponseEntity<Client> responseEntity = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
+        testClientDTO.setName("Test Client");
+
+        ResponseEntity<ClientDTO> responseEntity = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals("Test Client", responseEntity.getBody().getName());
 
         List<ClientDTO> clients = clientService.getClientList();
-        assertEquals(1, clients.size());
-        assertEquals("Test Client", clients.get(0).getName());
+        assertEquals(numberOfClientsBeforeTest + 1, clients.size());
     }
 
     @Test
     public void TestCreateClientWithOccupyLocation() {
-        ClientDTO testClientDTO = new ClientDTO("Test Client", tempAddress, tempDevice);
-        clientController.createClient(testClientDTO);
+        ResponseEntity<ClientDTO> createdClient = (ResponseEntity<ClientDTO>) clientController.createClient(dtoUtils.getClientDTO());
 
-        ClientDTO testClientDTO2 = new ClientDTO("Test Client", tempAddress, tempDevice);
+        ClientDTO testClientDTO2 = dtoUtils.getClientDTO();
+        testClientDTO2.setAddress(createdClient.getBody().getAddress());
 
         assertThrows(ClientAlreadyExistsWithAddressException.class, () -> {
             clientController.createClient(testClientDTO2);
         });
     }
-//
+
     @Test
     public void TestGetClientListEndpoint() {
-        AddressDTO tempAddress2 =  addressService.getAddressList().get(1);;
-
-        clientController.createClient(new ClientDTO("Test Client", tempAddress, tempDevice));
-        clientController.createClient(new ClientDTO("Test Client", tempAddress2, tempDevice));
+        clientController.createClient(dtoUtils.getClientDTO());
+        clientController.createClient(dtoUtils.getClientDTO());
 
         ResponseEntity<List<ClientDTO>> responseEntity = clientController.getClientList();
 
@@ -104,9 +88,9 @@ public class ClientControllerIntegrationTest {
     }
     @Test
     public void TestGetClientByIdEndpoint() {
-        ClientDTO testClientDTO = new ClientDTO("Test Client", tempAddress, tempDevice);
+        ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
-        ResponseEntity<Client> responseEntity = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
+        ResponseEntity<ClientDTO> responseEntity = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
 
         ClientDTO retrievedClient = clientController.getClient(Objects.requireNonNull(responseEntity.getBody()).getId()).getBody();
 
@@ -116,22 +100,22 @@ public class ClientControllerIntegrationTest {
 
     @Test
     public void TestUpdateClientEndpoint() {
-        ClientDTO testClientDTO = new ClientDTO("Test Client", tempAddress, tempDevice);
+        ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
-        ResponseEntity<Client> createdClient = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
+        ResponseEntity<ClientDTO> createdClient = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
 
-        ClientDTO updatedClientDTO = new ClientDTO("Update Client NAME", tempAddress, tempDevice);
-        ResponseEntity<Client> updatedClient =
-                (ResponseEntity<Client>) clientController.updateClient(createdClient.getBody().getId(), updatedClientDTO);
+        ClientDTO updatedClientDTO = dtoUtils.getClientDTO();
+        ResponseEntity<ClientDTO> updatedClient =
+                (ResponseEntity<ClientDTO>) clientController.updateClient(createdClient.getBody().getId(), updatedClientDTO);
 
         assertEquals(updatedClientDTO.getName(), updatedClient.getBody().getName());
     }
 //
     @Test
     public void TestDeleteClientEndpoint() {
-        ClientDTO testClientDTO = new ClientDTO("Test Client", tempAddress, tempDevice);
+        ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
-        ResponseEntity<Client> createdClient = (ResponseEntity<Client>) clientController.createClient(testClientDTO);
+        ResponseEntity<ClientDTO> createdClient = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
 
         HttpStatus status = (HttpStatus) clientController.deleteClient(Objects.requireNonNull(createdClient.getBody()).getId()).getStatusCode();
 

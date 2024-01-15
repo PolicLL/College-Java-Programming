@@ -41,11 +41,11 @@ public class Client {
         this.id = UUID.randomUUID();
     }
 
-    public void updateUsingDTO(ClientDTO clientDTO) {
-        if(clientDTO.getName() != null) this.setName(clientDTO.getName());
-        if(clientDTO.getAddress() != null) this.setAddress(clientDTO.getAddress());
-        if(clientDTO.getDevice() != null) this.setDevice(clientDTO.getDevice());
-    }
+//    public void updateUsingDTO(ClientDTO clientDTO) {
+//        if(clientDTO.getName() != null) this.setName(clientDTO.getName());
+//        if(clientDTO.getAddress() != null) this.setAddress(clientDTO.getAddress());
+//        if(clientDTO.getDevice() != null) this.setDevice(clientDTO.getDevice());
+//    }
 
     @Override
     public String toString() {

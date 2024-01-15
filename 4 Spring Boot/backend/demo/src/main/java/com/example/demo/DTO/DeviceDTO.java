@@ -17,7 +17,6 @@ public class DeviceDTO {
     private UUID id;
 
     public DeviceDTO(String name) {
-
         this.name = name;
     }
 

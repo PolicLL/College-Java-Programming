@@ -6,14 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+@Component
 @Mapper(componentModel = "spring")
 public interface AddressMapper {
     AddressMapper INSTANCE = Mappers.getMapper(AddressMapper.class);
 
-    @Mapping(target = "id", ignore = true)
     Address toAddress(AddressDTO addressDTO);
 
     AddressDTO toAddressDTO(Address address);

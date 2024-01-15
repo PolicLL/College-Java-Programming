@@ -4,6 +4,7 @@ import com.example.demo.DTO.AddressDTO;
 import com.example.demo.controller.AddressController;
 import com.example.demo.model.Address;
 import com.example.demo.service.AddressService;
+import com.example.demo.utils.DTOUtils;
 import org.flywaydb.test.FlywayTestExecutionListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ public class AddressControllerIntegrationTest {
     @Autowired
     private AddressService addressService;
 
+    @Autowired
+    private DTOUtils dtoUtils;
+
     private int tempNumberOfAddressesInDatabase = 0;
 
     @BeforeEach
@@ -52,8 +56,11 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testCreateAddress() {
 
-        AddressDTO addressDTO = new AddressDTO("Street Name 1", "Postal Code 1", "State 1");
-        ResponseEntity<Address> responseEntity = (ResponseEntity<Address>) addressController.createAddress(addressDTO);
+        AddressDTO addressDTO = dtoUtils.getAddressDTO();
+        addressDTO.setStreetName("Street Name 1");
+
+
+        ResponseEntity<AddressDTO> responseEntity = (ResponseEntity<AddressDTO>) addressController.createAddress(addressDTO);
 
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
@@ -68,8 +75,8 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testGetAllAddresses() {
 
-        addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
-        addressService.createAddress(new AddressDTO("Street Name 2", "Postal Code 2", "State 2"));
+        addressService.createAddress(dtoUtils.getAddressDTO());
+        addressService.createAddress(dtoUtils.getAddressDTO());
 
         List<AddressDTO> addressList = addressService.getAddressList();
 
@@ -82,22 +89,24 @@ public class AddressControllerIntegrationTest {
 
     @Test
     public void testGetAddressById() {
+        AddressDTO addressDTO = dtoUtils.getAddressDTO();
+        addressDTO.setStreetName("Street Name 1");
 
-        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
-        AddressDTO gettedAddress = addressController.getAddress(newAddress.getId()).getBody();
+        AddressDTO newAddress = addressService.createAddress(addressDTO);
+        AddressDTO retrievedAddress = addressController.getAddress(newAddress.getId()).getBody();
 
-        assertNotNull(gettedAddress);
-        assertEquals("Street Name 1", gettedAddress.getStreetName());
+        assertNotNull(retrievedAddress);
+        assertEquals("Street Name 1", retrievedAddress.getStreetName());
     }
 
     @Test
     public void testUpdateAddress() {
 
-        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
+        AddressDTO newAddress = addressService.createAddress(dtoUtils.getAddressDTO());
 
         AddressDTO addressDTO = new AddressDTO("Updated Address", "Updated Postal Code", "Updated State");
 
-        Address updateAddress = (Address) addressController.updateAddress(newAddress.getId(), addressDTO).getBody();
+        AddressDTO updateAddress = (AddressDTO) addressController.updateAddress(newAddress.getId(), addressDTO).getBody();
 
         assertNotNull(updateAddress);
         assertEquals("Updated Address", updateAddress.getStreetName());
@@ -108,7 +117,7 @@ public class AddressControllerIntegrationTest {
     @Test
     public void testDeleteAddress() {
 
-        AddressDTO newAddress = addressService.createAddress(new AddressDTO("Street Name 1", "Postal Code 1", "State 1"));
+        AddressDTO newAddress = addressService.createAddress(dtoUtils.getAddressDTO());
 
         HttpStatus status = (HttpStatus) addressController.deleteAddress(newAddress.getId()).getStatusCode();
 

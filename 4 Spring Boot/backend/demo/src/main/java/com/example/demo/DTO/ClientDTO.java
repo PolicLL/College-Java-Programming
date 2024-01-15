@@ -6,11 +6,17 @@ import com.example.demo.model.Address;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.UUID;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class ClientDTO {
+    private UUID id;
     private String name;
     private AddressDTO address;
     private DeviceDTO device;

@@ -6,6 +6,7 @@ import com.example.demo.exception.response.ErrorResponse;
 import com.example.demo.exception.InvalidInputException;
 import com.example.demo.model.Address;
 import com.example.demo.service.AddressService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/address")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AddressController {
 
 	private static final Logger logger = LoggerFactory.getLogger(AddressController.class);

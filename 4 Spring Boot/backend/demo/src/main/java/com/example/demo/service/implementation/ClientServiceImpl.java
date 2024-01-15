@@ -1,13 +1,16 @@
 package com.example.demo.service.implementation;
 
+import com.example.demo.DTO.AddressDTO;
 import com.example.demo.DTO.ClientDTO;
 import com.example.demo.exception.ClientAlreadyExistsWithAddressException;
 import com.example.demo.exception.ClientNotFoundException;
+import com.example.demo.mapper.AddressMapper;
 import com.example.demo.mapper.ClientMapper;
 import com.example.demo.model.Address;
 import com.example.demo.model.Client;
 import com.example.demo.repository.ClientRepository;
 import com.example.demo.service.ClientService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +22,14 @@ import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
 	private final ClientRepository clientRepository;
 
-	private ClientMapper clientMapper;
+	private final ClientMapper clientMapper;
+
+	private final AddressMapper addressMapper;
 
 	private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
 
@@ -72,9 +77,9 @@ public class ClientServiceImpl implements ClientService {
 	public ClientDTO updateClient(UUID clientID, ClientDTO clientDTO) {
 
 		logger.info("Updating client with ID {}: {}", clientID, clientDTO);
-		Client clientToUpdate = retrieveClient(clientID);
-		clientToUpdate.updateUsingDTO(clientDTO);
-		Client updatedClient = clientRepository.save(clientToUpdate);
+		Client existingClient = retrieveClient(clientID);
+		Client updatedClient = clientMapper.toClient(clientDTO);
+		updatedClient.setId(existingClient.getId());
 		logger.info("Client updated successfully: {}", updatedClient);
 		return this.clientMapper.toClientDTO(updatedClient);
 	}
@@ -104,13 +109,15 @@ public class ClientServiceImpl implements ClientService {
 		return this.clientMapper.toClientDTO(client);
 	}
 
-	private boolean isSomeOtherClientOnThisAddress(Address address) {
+	private boolean isSomeOtherClientOnThisAddress(AddressDTO address) {
 
 		logger.info("Checking if there is another client with the given address: {}", address);
 		List<Client> clients = clientRepository.findAll();
 
+		Address mappedAddress = addressMapper.toAddress(address);
+
 		for (Client client : clients)
-			if (client.getAddress().equals(address)) {
+			if (client.getAddress().equals(mappedAddress)) {
 				logger.warn("Another client already exists with the given address: {}", address);
 				return true;
 			}

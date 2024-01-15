@@ -14,6 +14,7 @@ import com.example.demo.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,9 +27,7 @@ public class DeviceServiceImpl implements DeviceService {
 
 	private final DeviceRepository deviceRepository;
 
-	private final MeasurementConsumptionService measurementConsumptionService;
-
-	private DeviceMapper deviceMapper;
+	private final DeviceMapper deviceMapper;
 
 	private static final Logger logger = LoggerFactory.getLogger(DeviceServiceImpl.class);
 
@@ -150,8 +149,8 @@ public class DeviceServiceImpl implements DeviceService {
 		}
 
 		//
-		MeasurementConsumption consumptionDTO = measurementConsumptionService.createMeasurementConsumption(measurementConsumptionDTO, deviceID);
-		device.addMeasurement(consumptionDTO);
+//		MeasurementConsumption consumptionDTO = measurementConsumptionService.createMeasurementConsumption(measurementConsumptionDTO, deviceID);
+//		device.addMeasurement(consumptionDTO);
 		//
 
 		Device updatedDevice = deviceRepository.save(device);

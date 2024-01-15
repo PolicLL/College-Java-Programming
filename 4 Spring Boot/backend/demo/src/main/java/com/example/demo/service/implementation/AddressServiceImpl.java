@@ -96,9 +96,9 @@ public class AddressServiceImpl implements AddressService {
 	public AddressDTO updateAddress(UUID addressId, AddressDTO addressDTO) {
 
 		logger.info("Updating address with ID {}: {}", addressId, addressDTO);
-		Address address = requireAddress(addressId);
-		address.updateUsingDTO(addressDTO);
-		Address updatedAddress = addressRepository.save(address);
+		Address existingAddress = requireAddress(addressId);
+		Address updatedAddress = addressMapper.toAddress(addressDTO);
+		updatedAddress.setId(existingAddress.getId());
 		logger.info("Address updated successfully: {}", updatedAddress);
 		return addressMapper.toAddressDTO(updatedAddress);
 	}

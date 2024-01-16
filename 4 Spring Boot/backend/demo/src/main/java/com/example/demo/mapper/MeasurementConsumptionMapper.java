@@ -16,10 +16,10 @@ public interface MeasurementConsumptionMapper {
 
 	MeasurementConsumptionMapper INSTANCE = Mappers.getMapper(MeasurementConsumptionMapper.class);
 
-	@Mapping(target = "device", ignore = true)
 	@Mapping(target = "device.id", source = "deviceID")
 	MeasurementConsumption toMeasurementConsumption(MeasurementConsumptionDTO measurementDTO);
 
+	@Mapping(target = "deviceID", source = "device.id")
 	MeasurementConsumptionDTO toMeasurementConsumptionDTO(MeasurementConsumption measurementConsumption);
 
 	default UUID mapDeviceID(DeviceDTO deviceDTO) {

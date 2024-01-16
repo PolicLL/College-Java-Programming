@@ -70,9 +70,8 @@ public class DTOUtils {
 
 	public MeasurementConsumptionDTO getMeasurementConsumptionDTO(){
 		++measurementConsumption;
-		DeviceDTO createdDeviceDTO = deviceService.createDevice(getDeviceDTO());
 		return new MeasurementConsumptionDTO
-				(DateUtils.getDate(), MeasuringUnitEnergyConsumption.kWh, new Random().nextDouble() * 120, createdDeviceDTO.getId());
+				(DateUtils.getDate(), MeasuringUnitEnergyConsumption.kWh, new Random().nextDouble() * 120);
 	}
 
 }

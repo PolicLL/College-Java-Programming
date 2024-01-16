@@ -47,7 +47,11 @@ public class MeasurementConsumptionServiceImpl implements MeasurementConsumption
 		if (!deviceServiceImpl.isThereMeasurementForMonthInYear(deviceID, month, year)) {
 			MeasurementConsumption measurementConsumption = measurementConsumptionRepository.save(newMeasurement);
 			logger.info("Measurement consumption created successfully.");
-			return measurementConsumptionMapper.toMeasurementConsumptionDTO(measurementConsumption);
+			MeasurementConsumptionDTO result = measurementConsumptionMapper.toMeasurementConsumptionDTO(newMeasurement);
+
+			logger.info("Result : {}", result);
+
+			return result;
 		}
 
 		logger.error("Measurement for this month in year already exists.");

@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class MeasurementConsumptionDTO {
 
 	private UUID id;
@@ -36,5 +37,7 @@ public class MeasurementConsumptionDTO {
 		this.measurementValue = measurementValue;
 		this.deviceID = deviceID;
 	}
+
+
 
 }

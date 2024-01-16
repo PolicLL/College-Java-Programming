@@ -64,6 +64,7 @@ public class MeasurementConsumptionControllerIntegrationTest {
 		return  measurementConsumptionController.createMeasurementConsumption(id, measurementConsumptionDTO);
 	}
 
+
 	@Test
 	public void testCreateMeasurementConsumptionEndpoint() {
 		ResponseEntity<?> responseEntity = createMeasurementConsumption();
@@ -121,14 +122,15 @@ public class MeasurementConsumptionControllerIntegrationTest {
 
 	@Test
 	public void testMeasurementConsumptionForMonthAlreadyExists() {
-		ResponseEntity<?> createResponse = createMeasurementConsumption();
+		MeasurementConsumptionDTO createResponse = (MeasurementConsumptionDTO) createMeasurementConsumption().getBody();
 
-		assertNotNull(createResponse.getBody());
+		assertNotNull(createResponse);
 
-		MeasurementConsumptionDTO responseDTO = (MeasurementConsumptionDTO) createResponse.getBody();
+		MeasurementConsumptionDTO newDTO = new MeasurementConsumptionDTO();
+		newDTO.setMeasurementDate(createResponse.getMeasurementDate());
 
 		assertThrows(MeasurementForThisMonthInYearExistsException.class, () -> {
-			createMeasurementConsumption(responseDTO.getDeviceID(), responseDTO);
+			createMeasurementConsumption(createResponse.getDeviceID(), newDTO);
 		});
 
 

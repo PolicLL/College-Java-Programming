@@ -1,12 +1,16 @@
-package com.example.demo;
+package com.example.demo.h2;
 
+import com.example.demo.Lab6Application;
 import com.example.demo.controller.ClientController;
+import com.example.demo.exception.AddressNotFoundException;
 import com.example.demo.exception.ClientAlreadyExistsWithAddressException;
+import com.example.demo.exception.ClientNotFoundException;
 import com.example.demo.model.Client;
 import com.example.demo.DTO.ClientDTO;
 import com.example.demo.service.ClientService;
 import com.example.demo.utils.DTOUtils;
 import org.flywaydb.test.FlywayTestExecutionListener;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,13 +49,11 @@ public class ClientControllerIntegrationTest {
 
     @BeforeEach
     public void setUp(){
-        clientService.deleteAll();
-
         numberOfClientsBeforeTest = clientService.getClientList().size();
     }
 
     @Test
-    public void TestCreateClientEndpoint() {
+    public void TestCreateClient() {
         ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
         testClientDTO.setName("Test Client");
@@ -78,16 +81,16 @@ public class ClientControllerIntegrationTest {
     }
 
     @Test
-    public void TestGetClientListEndpoint() {
+    public void TestGetClientList() {
         clientController.createClient(dtoUtils.getClientDTO());
         clientController.createClient(dtoUtils.getClientDTO());
 
         ResponseEntity<List<ClientDTO>> responseEntity = clientController.getClientList();
 
-        assertEquals(2, responseEntity.getBody().size());
+        assertEquals(numberOfClientsBeforeTest + 2, responseEntity.getBody().size());
     }
     @Test
-    public void TestGetClientByIdEndpoint() {
+    public void TestGetClientById() {
         ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
         ResponseEntity<ClientDTO> responseEntity = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
@@ -99,7 +102,16 @@ public class ClientControllerIntegrationTest {
     }
 
     @Test
-    public void TestUpdateClientEndpoint() {
+    public void testGetClientByIdException() {
+
+        UUID fakeID = UUID.randomUUID();
+        Assertions.assertThrows(ClientNotFoundException.class, () -> {
+            clientController.getClient(fakeID).getBody();
+        });
+    }
+
+    @Test
+    public void TestUpdateClient() {
         ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
         ResponseEntity<ClientDTO> createdClient = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);
@@ -112,7 +124,7 @@ public class ClientControllerIntegrationTest {
     }
 //
     @Test
-    public void TestDeleteClientEndpoint() {
+    public void TestDeleteClient() {
         ClientDTO testClientDTO = dtoUtils.getClientDTO();
 
         ResponseEntity<ClientDTO> createdClient = (ResponseEntity<ClientDTO>) clientController.createClient(testClientDTO);

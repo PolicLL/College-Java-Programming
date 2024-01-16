@@ -15,6 +15,10 @@ public class DateUtils {
 		return month;
 	}
 
+	public static Date getDate() {
+		return new Date();
+	}
+
 	public static int getYearFromDate(Date date) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);

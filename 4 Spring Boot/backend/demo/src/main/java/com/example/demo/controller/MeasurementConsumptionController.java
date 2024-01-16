@@ -31,15 +31,15 @@ public class MeasurementConsumptionController {
 	@PostMapping("/{deviceId}")
 	public ResponseEntity<?> createMeasurementConsumption(@PathVariable UUID deviceId, @RequestBody MeasurementConsumptionDTO measurementDTO) {
 
-		MeasurementConsumption createdMeasurement = measurementConsumptionService.createMeasurementConsumption(measurementDTO, deviceId);
+		MeasurementConsumptionDTO createdMeasurement = measurementConsumptionService.createMeasurementConsumption(measurementDTO, deviceId);
 		logger.info("Measurement consumption created: " + createdMeasurement.toString());
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdMeasurement);
 	}
 
 	@GetMapping
-	public ResponseEntity<List<MeasurementConsumption>> getMeasurementConsumptionList() {
+	public ResponseEntity<List<MeasurementConsumptionDTO>> getMeasurementConsumptionList() {
 
-		List<MeasurementConsumption> measurementConsumptions = measurementConsumptionService.getMeasurementConsumptionList();
+		List<MeasurementConsumptionDTO> measurementConsumptions = measurementConsumptionService.getMeasurementConsumptionList();
 
 		return Optional.ofNullable(measurementConsumptions)
 				.map(list -> {
@@ -58,8 +58,8 @@ public class MeasurementConsumptionController {
 	}
 
 	@GetMapping("/byDevice/{deviceId}")
-	public ResponseEntity<List<MeasurementConsumption>> getAllMeasurementsForDevice(@PathVariable UUID deviceId) {
-		List<MeasurementConsumption> measurements = measurementConsumptionService.getAllMeasurementsForDevice(deviceId);
+	public ResponseEntity<List<MeasurementConsumptionDTO>> getAllMeasurementsForDevice(@PathVariable UUID deviceId) {
+		List<MeasurementConsumptionDTO> measurements = measurementConsumptionService.getAllMeasurementsForDevice(deviceId);
 
 		return measurements.isEmpty()
 				? ResponseEntity.status(HttpStatus.NOT_FOUND).body(measurements)
@@ -119,18 +119,18 @@ public class MeasurementConsumptionController {
 	@GetMapping("/{measurementId}")
 	public ResponseEntity<?> getMeasurementConsumptionById(@PathVariable UUID measurementId) {
 
-		Optional<MeasurementConsumption> measurementConsumption = measurementConsumptionService.getMeasurementConsumptionById(measurementId);
-		return measurementConsumption.map(response -> {
+		return Optional.ofNullable(measurementConsumptionService.getMeasurementConsumptionById(measurementId))
+				.map(measurementConsumptionDTO -> {
 					logger.info("Retrieved measurement consumption by ID: " + measurementId.toString());
-					return ResponseEntity.ok(response);
+					return ResponseEntity.ok(measurementConsumptionDTO);
 				})
-				.orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 
 	@PutMapping("/{measurementId}")
 	public ResponseEntity<?> updateMeasurementConsumption(@PathVariable UUID measurementId, @RequestBody MeasurementConsumptionDTO measurementDTO) {
 
-		MeasurementConsumption updatedMeasurement = measurementConsumptionService.updateMeasurementConsumption(measurementId, measurementDTO);
+		MeasurementConsumptionDTO updatedMeasurement = measurementConsumptionService.updateMeasurementConsumption(measurementId, measurementDTO);
 		logger.info("Measurement consumption updated: " + updatedMeasurement.toString());
 		return ResponseEntity.ok(updatedMeasurement);
 	}

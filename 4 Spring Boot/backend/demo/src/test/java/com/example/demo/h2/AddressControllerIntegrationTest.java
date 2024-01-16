@@ -1,16 +1,20 @@
-package com.example.demo;
+package com.example.demo.h2;
 
 import com.example.demo.DTO.AddressDTO;
+import com.example.demo.Lab6Application;
 import com.example.demo.controller.AddressController;
+import com.example.demo.exception.AddressNotFoundException;
 import com.example.demo.model.Address;
 import com.example.demo.service.AddressService;
 import com.example.demo.utils.DTOUtils;
 import org.flywaydb.test.FlywayTestExecutionListener;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
@@ -18,6 +22,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,7 +54,6 @@ public class AddressControllerIntegrationTest {
     }
 
     private void setTempNumberOfAddressesInDatabase(){
-
         tempNumberOfAddressesInDatabase = addressService.getAddressList().size();
     }
 
@@ -88,6 +92,32 @@ public class AddressControllerIntegrationTest {
     }
 
     @Test
+    public void testGetAllAddressesPagination() {
+
+        addressService.deleteAll();
+
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 1"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 2"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 3"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 4"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 5"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 6"));
+        addressService.createAddress(dtoUtils.getAddressDTO("Name 7"));
+
+        String[] sort = new String[] { "streetName", "asc"};
+        int page = 1;
+        int size = 3;
+
+        Page<AddressDTO> addressDTOPage = addressService.getAddressPageWithSorting(page, size, sort);
+        List<AddressDTO> addressDTOList = addressDTOPage.getContent();
+
+        assertEquals("Name 4", addressDTOList.get(0).getStreetName());
+        assertEquals("Name 5", addressDTOList.get(1).getStreetName());
+        assertEquals("Name 6", addressDTOList.get(2).getStreetName());
+
+    }
+
+    @Test
     public void testGetAddressById() {
         AddressDTO addressDTO = dtoUtils.getAddressDTO();
         addressDTO.setStreetName("Street Name 1");
@@ -97,6 +127,15 @@ public class AddressControllerIntegrationTest {
 
         assertNotNull(retrievedAddress);
         assertEquals("Street Name 1", retrievedAddress.getStreetName());
+    }
+
+    @Test
+    public void testGetAddressByIdException() {
+
+        UUID fakeID = UUID.randomUUID();
+        Assertions.assertThrows(AddressNotFoundException.class, () -> {
+            addressController.getAddress(fakeID).getBody();
+        });
     }
 
     @Test

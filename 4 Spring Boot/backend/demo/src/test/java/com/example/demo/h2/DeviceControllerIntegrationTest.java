@@ -1,11 +1,15 @@
-package com.example.demo;
+package com.example.demo.h2;
 
 import com.example.demo.DTO.DeviceDTO;
+import com.example.demo.Lab6Application;
 import com.example.demo.controller.DeviceController;
+import com.example.demo.exception.ClientNotFoundException;
+import com.example.demo.exception.DeviceNotFoundException;
 import com.example.demo.model.Device;
 import com.example.demo.service.implementation.DeviceServiceImpl;
 import com.example.demo.utils.DTOUtils;
 import org.flywaydb.test.FlywayTestExecutionListener;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,9 +47,11 @@ public class DeviceControllerIntegrationTest {
     @Autowired
     private DTOUtils dtoUtils;
 
+    private int numberOfDevicesBeforeTest = 0;
+
     @BeforeEach
     public void setUp(){
-        deviceServiceImpl.deleteAll();
+        numberOfDevicesBeforeTest = deviceServiceImpl.getDeviceList().size();
     }
 
     @Test
@@ -58,8 +65,7 @@ public class DeviceControllerIntegrationTest {
         assertEquals("Device 1", responseEntity.getBody().getName());
 
         List<DeviceDTO> deviceList = deviceServiceImpl.getDeviceList();
-        assertEquals(1, deviceList.size());
-        assertEquals("Device 1", deviceList.get(0).getName());
+        assertEquals(numberOfDevicesBeforeTest + 1, deviceList.size());
 
     }
 
@@ -72,7 +78,7 @@ public class DeviceControllerIntegrationTest {
         List<DeviceDTO> deviceList = deviceController.getDeviceList().getBody();
 
         assertNotNull(deviceList);
-        assertEquals(2, deviceList.size());
+        assertEquals(numberOfDevicesBeforeTest + 2, deviceList.size());
     }
 
 
@@ -87,6 +93,15 @@ public class DeviceControllerIntegrationTest {
 
         assertNotNull(gotDevice);
         assertEquals("Device 1", gotDevice.getName());
+    }
+
+    @Test
+    public void testGetDeviceByIdException() {
+
+        UUID fakeID = UUID.randomUUID();
+        Assertions.assertThrows(DeviceNotFoundException.class, () -> {
+            deviceController.getDevice(fakeID).getBody();
+        });
     }
 
 

@@ -16,7 +16,6 @@ public interface MeasurementConsumptionMapper {
 
 	MeasurementConsumptionMapper INSTANCE = Mappers.getMapper(MeasurementConsumptionMapper.class);
 
-	@Mapping(target = "id", ignore = true)
 	@Mapping(target = "device", ignore = true)
 	@Mapping(target = "device.id", source = "deviceID")
 	MeasurementConsumption toMeasurementConsumption(MeasurementConsumptionDTO measurementDTO);

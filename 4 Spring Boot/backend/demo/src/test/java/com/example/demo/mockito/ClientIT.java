@@ -4,6 +4,7 @@ import com.example.demo.DTO.AddressDTO;
 import com.example.demo.DTO.ClientDTO;
 import com.example.demo.controller.ClientController;
 import com.example.demo.service.ClientService;
+import com.example.demo.utils.TestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +63,7 @@ public class ClientIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/client")
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(asJsonString(clientDTO)))
+						.content(TestUtils.asJsonString(clientDTO)))
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.name", equalTo("Test Client")));
 
@@ -110,7 +111,7 @@ public class ClientIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/client/{clientId}", clientID)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(asJsonString(clientDTO)))
+						.content(TestUtils.asJsonString(clientDTO)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.name", equalTo("Updated Client")));
 
@@ -141,18 +142,6 @@ public class ClientIT {
 				.andExpect(jsonPath("$.name", equalTo("Test Client")));
 
 		verify(clientService, times(1)).getClientsByDeviceId(eq(deviceID));
-	}
-
-	// Utility method to convert objects to JSON strings
-	private String asJsonString(Object obj) {
-
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.registerModule(new JavaTimeModule());
-			return objectMapper.writeValueAsString(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 }

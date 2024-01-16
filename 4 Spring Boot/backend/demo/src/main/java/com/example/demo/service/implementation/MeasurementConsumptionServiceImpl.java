@@ -77,15 +77,12 @@ public class MeasurementConsumptionServiceImpl implements MeasurementConsumption
 	public MeasurementConsumptionDTO updateMeasurementConsumption(UUID measurementID, MeasurementConsumptionDTO measurementDTO) {
 
 		logger.info("Updating measurement consumption with ID: {}", measurementID);
-		MeasurementConsumption measurementToUpdate = retrieveMeasurementConsumption(measurementID);
-		measurementToUpdate.updateUsingDTO(measurementDTO);
+		MeasurementConsumption existingMeasurement = retrieveMeasurementConsumption(measurementID);
+		MeasurementConsumption updatedMeasurement = measurementConsumptionMapper.toMeasurementConsumption(measurementDTO);
+		updatedMeasurement.setId(measurementID);
 
-		MeasurementConsumption newMeasurementConsumption = measurementConsumptionMapper.toMeasurementConsumption(measurementDTO);
-		newMeasurementConsumption.setId(measurementToUpdate.getId());
-
-		measurementConsumptionRepository.save(newMeasurementConsumption);
 		logger.info("Measurement consumption updated successfully.");
-		return measurementDTO;
+		return measurementConsumptionMapper.toMeasurementConsumptionDTO(updatedMeasurement);
 	}
 
 	private MeasurementConsumption retrieveMeasurementConsumption(UUID id) {

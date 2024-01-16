@@ -66,16 +66,4 @@ public class MeasurementConsumption {
                 this.id, this.measurementDate, this.measuringUnitEnergyConsumption, this.measurementValue);
     }
 
-    public void updateUsingDTO(MeasurementConsumptionDTO measurementDTO) {
-        if (measurementDTO.getMeasurementDate() != null) {
-            this.setMeasurementDate(measurementDTO.getMeasurementDate());
-        }
-        if (measurementDTO.getMeasuringUnitEnergyConsumption() != null) {
-            this.setMeasuringUnitEnergyConsumption(measurementDTO.getMeasuringUnitEnergyConsumption());
-        }
-        if (measurementDTO.getMeasurementValue() != 0.0) {
-            this.setMeasurementValue(measurementDTO.getMeasurementValue());
-        }
-    }
-
 }

@@ -22,7 +22,4 @@ public interface MeasurementConsumptionMapper {
 	@Mapping(target = "deviceID", source = "device.id")
 	MeasurementConsumptionDTO toMeasurementConsumptionDTO(MeasurementConsumption measurementConsumption);
 
-	default UUID mapDeviceID(DeviceDTO deviceDTO) {
-		return deviceDTO != null ? deviceDTO.getId() : null;
-	}
 }

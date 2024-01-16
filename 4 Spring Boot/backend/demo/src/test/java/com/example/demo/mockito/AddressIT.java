@@ -6,6 +6,7 @@ import com.example.demo.Lab6Application;
 import com.example.demo.controller.AddressController;
 import com.example.demo.service.AddressService;
 import com.example.demo.utils.DTOUtils;
+import com.example.demo.utils.TestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +67,7 @@ public class AddressIT {
 		mockMvc.perform(MockMvcRequestBuilders
 						.post("/address")
 						.contentType(MediaType.APPLICATION_JSON) // Set content type
-						.content(asJsonString(new AddressDTO()))) // Convert DTO to JSON string
+						.content(TestUtils.asJsonString(new AddressDTO()))) // Convert DTO to JSON string
 				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.streetName").value("Street Name 1"));
 
@@ -115,7 +116,7 @@ public class AddressIT {
 
 		mockMvc.perform(MockMvcRequestBuilders.put("/address/{addressId}", addressID)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(asJsonString(addressDTO)))
+						.content(TestUtils.asJsonString(addressDTO)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.streetName", equalTo("Updated Street")));
 
@@ -132,16 +133,6 @@ public class AddressIT {
 		verify(addressService, times(1)).deleteAddress(eq(addressId));
 	}
 
-	private String asJsonString(Object obj) {
-
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.registerModule(new JavaTimeModule());
-			return objectMapper.writeValueAsString(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 }
 
 

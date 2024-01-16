@@ -80,7 +80,7 @@ public class ClientController {
 		ClientDTO client = clientService.getClientsByDeviceId(deviceId);
 		logger.info("Retrieved client by device ID: " + deviceId.toString());
 
-		return Optional.ofNullable(clientService.getClientsByDeviceId(deviceId))
+		return Optional.ofNullable(client)
 				.map(ResponseEntity::ok)
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body(client));
 	}
